@@ -1,12 +1,34 @@
 import React from 'react'
+import * as THREE from 'three'
 import { Canvas,useThree } from '@react-three/fiber'
-import { OrbitControls ,useGLTF} from '@react-three/drei'
+import { OrbitControls ,useGLTF,useTexture} from '@react-three/drei'
+import { sample, texture } from 'three/tsl'
 
 const Dog = () => {
     const model=useGLTF("/models/dog.drc.glb")
     useThree(({camera,scene,gl})=>{
-        console.log(camera.position)
         camera.position.z=0.55
+        gl.toneMapping=THREE.ReinhardToneMapping
+        gl.outputColorSpace=THREE.SRGBColorSpace
+    })
+
+    
+
+    const [normalMap,sampleMatCap]=(useTexture(["/dog_normals.jpg","/matcap/mat-2.png"])).map(texture=>{
+        texture.flipY=false
+        texture.colorSpace=THREE.SRGBColorSpace
+        return texture
+    })
+   
+    const dogMaterial=new THREE.MeshMatcapMaterial({
+                normalMap:normalMap,
+                matcap:sampleMatCap
+            })
+
+    model.scene.traverse((child)=>{
+        if(child.name.includes("DOG")){
+            child.material=dogMaterial
+        }
     })
   return (
     <>

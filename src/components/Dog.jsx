@@ -3,8 +3,14 @@ import * as THREE from 'three'
 import { Canvas,useThree } from '@react-three/fiber'
 import { OrbitControls ,useGLTF,useTexture,useAnimations} from '@react-three/drei'
 import { sample, texture } from 'three/tsl'
+import gsap from 'gsap'
+import {useGSAP} from '@gsap/react'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 const Dog = () => {
+    gsap.registerPlugin(useGSAP)
+    gsap.registerPlugin(ScrollTrigger)
+
     const model=useGLTF("/models/dog.drc.glb")
     useThree(({camera,scene,gl})=>{
         camera.position.z=0.55

@@ -1,7 +1,7 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import * as THREE from 'three'
 import { Canvas,useThree } from '@react-three/fiber'
-import { OrbitControls ,useGLTF,useTexture} from '@react-three/drei'
+import { OrbitControls ,useGLTF,useTexture,useAnimations} from '@react-three/drei'
 import { sample, texture } from 'three/tsl'
 
 const Dog = () => {
@@ -11,30 +11,40 @@ const Dog = () => {
         gl.toneMapping=THREE.ReinhardToneMapping
         gl.outputColorSpace=THREE.SRGBColorSpace
     })
-
-    
-
-    const [normalMap,sampleMatCap]=(useTexture(["/dog_normals.jpg","/matcap/mat-2.png"])).map(texture=>{
+    const {actions}=useAnimations(model.animations,model.scene)
+    useEffect(()=>{
+        actions["Take 001"].play()
+    },[actions])
+    const [normalMap,sampleMatCap]=(useTexture(["/dog_normals.jpg","/matcap/mat-2.png","/branches_diffuse.jpeg","/branches_normals.jpeg"])).map(texture=>{
         texture.flipY=false
         texture.colorSpace=THREE.SRGBColorSpace
         return texture
     })
-   
+    const[branchMap,branchNormalMap]=(useTexture(["/branches_diffuse.jpeg","/branches_normals.jpeg"])).map(texture=>{
+        texture.colorSpace=THREE.SRGBColorSpace
+        return texture
+    })
     const dogMaterial=new THREE.MeshMatcapMaterial({
-                normalMap:normalMap,
-                matcap:sampleMatCap
-            })
+        normalMap:normalMap,
+        matcap:sampleMatCap
+    })
+    const branchMaterial=new THREE.MeshMatcapMaterial({
+        normalMap:branchMap,
+        map:branchMap
+    })
 
     model.scene.traverse((child)=>{
         if(child.name.includes("DOG")){
             child.material=dogMaterial
+        }
+        else{
+            child.material=branchMaterial
         }
     })
   return (
     <>
         <primitive object={model.scene} position={[0.25,-0.55,0]} rotation={[0,Math.PI/3.9,0]}/>
         <directionalLight color={0xFFFFFF} position={[0,5,5]} intensity={10}/>
-        <OrbitControls/>
     </>
   )
 }

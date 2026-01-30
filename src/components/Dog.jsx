@@ -1,19 +1,17 @@
 import React from 'react'
 import { Canvas,useThree } from '@react-three/fiber'
-import { OrbitControls } from '@react-three/drei'
+import { OrbitControls ,useGLTF} from '@react-three/drei'
 
 const Dog = () => {
-
+    const model=useGLTF("/models/dog.drc.glb")
     useThree(({camera,scene,gl})=>{
         console.log(camera.position)
+        camera.position.z=0.55
     })
-
   return (
     <>
-        <mesh>
-            <meshBasicMaterial color={0x00FF00}/>
-            <boxGeometry args={[1,1,1]}/>
-        </mesh>
+        <primitive object={model.scene} position={[0.25,-0.55,0]} rotation={[0,Math.PI/3.9,0]}/>
+        <directionalLight color={0xFFFFFF} position={[0,5,5]} intensity={10}/>
         <OrbitControls/>
     </>
   )
